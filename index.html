@@ -941,10 +941,10 @@
             const msgBox = document.getElementById('form-msg');
             const btnSpan = form.querySelector('button[type="submit"] span');
             const origBtn = btnSpan.textContent;
-            const okText = 'Thank you! Your message has been sent. I will reply to you shortly.';
             btnSpan.textContent = 'Sending...';
-            msgBox.textContent = okText;
-            msgBox.className = 'p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono text-center';
+            msgBox.textContent = 'Sending your message...';
+            msgBox.className = 'p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono text-center';
+            msgBox.classList.remove('hidden');
 
             fetch('https://formsubmit.co/ajax/awais.qureshi77@gmail.com', {
                 method: 'POST',
@@ -961,7 +961,8 @@
             })
             .then(res => { if (!res.ok) throw new Error('send failed'); return res.json(); })
             .then(() => {
-                msgBox.classList.remove('hidden');
+                msgBox.textContent = 'Thank you! Your message has been sent. I will reply to you shortly.';
+                msgBox.className = 'p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono text-center';
                 form.reset();
             })
             .catch(() => {
