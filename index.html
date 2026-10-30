@@ -934,7 +934,7 @@
             });
         });
 
-        // Contact Form Handler - sends via FormSubmit to awais.qureshi77@gmail.com
+        // Contact Form Handler - sends via Web3Forms to awais.qureshi77@gmail.com
         function handleFormSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -946,20 +946,22 @@
             msgBox.className = 'p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono text-center';
             msgBox.classList.remove('hidden');
 
-            fetch('https://formsubmit.co/ajax/awais.qureshi77@gmail.com', {
+            const senderEmail = form.querySelector('[name="email"]').value;
+            fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({
+                    access_key: 'b537c239-ebc7-41a4-a88b-d2b641503fd4',
                     name: form.querySelector('[name="name"]').value,
-                    email: form.querySelector('[name="email"]').value,
-                    subject: form.querySelector('[name="subject"]').value,
+                    email: senderEmail,
+                    replyto: senderEmail,
+                    subject: 'Portfolio contact: ' + form.querySelector('[name="subject"]').value,
                     message: form.querySelector('[name="message"]').value,
-                    _subject: 'Portfolio contact: ' + form.querySelector('[name="subject"]').value,
-                    _template: 'table',
-                    _captcha: 'false'
+                    from_name: 'Portfolio Contact Form'
                 })
             })
-            .then(res => { if (!res.ok) throw new Error('send failed'); return res.json(); })
+            .then(res => res.json())
+            .then(data => { if (!data.success) throw new Error(data.message || 'send failed'); })
             .then(() => {
                 msgBox.textContent = 'Thank you! Your message has been sent. I will reply to you shortly.';
                 msgBox.className = 'p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono text-center';
