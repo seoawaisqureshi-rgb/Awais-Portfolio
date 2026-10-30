@@ -812,22 +812,22 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div class="space-y-2">
                                     <label class="text-xs font-mono text-slate-300 uppercase">Your Name</label>
-                                    <input type="text" required placeholder="John Doe" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
+                                    <input type="text" name="name" required placeholder="John Doe" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-xs font-mono text-slate-300 uppercase">Your Email</label>
-                                    <input type="email" required placeholder="john@example.com" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
+                                    <input type="email" name="email" required placeholder="john@example.com" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
                                 </div>
                             </div>
 
                             <div class="space-y-2">
                                 <label class="text-xs font-mono text-slate-300 uppercase">Subject</label>
-                                <input type="text" required placeholder="Project Inquiry / Job Opportunity" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
+                                <input type="text" name="subject" required placeholder="Project Inquiry / Job Opportunity" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm">
                             </div>
 
                             <div class="space-y-2">
                                 <label class="text-xs font-mono text-slate-300 uppercase">Message</label>
-                                <textarea rows="4" required placeholder="Write your message here..." class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm resize-none"></textarea>
+                                <textarea name="message" rows="4" required placeholder="Write your message here..." class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition text-sm resize-none"></textarea>
                             </div>
 
                             <button type="submit" class="w-full py-4 rounded-xl font-bold text-slate-900 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 hover:opacity-95 transition shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2">
@@ -934,15 +934,45 @@
             });
         });
 
-        // Contact Form Handler
+        // Contact Form Handler - sends via FormSubmit to awais.qureshi77@gmail.com
         function handleFormSubmit(e) {
             e.preventDefault();
+            const form = e.target;
             const msgBox = document.getElementById('form-msg');
-            msgBox.classList.remove('hidden');
-            e.target.reset();
-            setTimeout(() => {
-                msgBox.classList.add('hidden');
-            }, 5000);
+            const btnSpan = form.querySelector('button[type="submit"] span');
+            const origBtn = btnSpan.textContent;
+            const okText = 'Thank you! Your message has been sent. I will reply to you shortly.';
+            btnSpan.textContent = 'Sending...';
+            msgBox.textContent = okText;
+            msgBox.className = 'p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono text-center';
+
+            fetch('https://formsubmit.co/ajax/awais.qureshi77@gmail.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    name: form.querySelector('[name="name"]').value,
+                    email: form.querySelector('[name="email"]').value,
+                    subject: form.querySelector('[name="subject"]').value,
+                    message: form.querySelector('[name="message"]').value,
+                    _subject: 'Portfolio contact: ' + form.querySelector('[name="subject"]').value,
+                    _template: 'table',
+                    _captcha: 'false'
+                })
+            })
+            .then(res => { if (!res.ok) throw new Error('send failed'); return res.json(); })
+            .then(() => {
+                msgBox.classList.remove('hidden');
+                form.reset();
+            })
+            .catch(() => {
+                msgBox.textContent = 'Could not send right now. Please email me directly at awais.qureshi77@gmail.com';
+                msgBox.className = 'p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono text-center';
+                msgBox.classList.remove('hidden');
+            })
+            .finally(() => {
+                btnSpan.textContent = origBtn;
+                setTimeout(() => { msgBox.classList.add('hidden'); }, 8000);
+            });
         }
 
 // 3D Card Tilt Effect
